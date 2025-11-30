@@ -1,0 +1,247 @@
+/* Game Screen */
+.game-screen {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  position: relative;
+}
+
+/* Points Counter - Bottom Left */
+.points-counter {
+  position: fixed;
+  bottom: 2rem;
+  left: 2rem;
+  background: white;
+  color: #667eea;
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+}
+
+.game-container {
+  background: white;
+  border-radius: 20px;
+  padding: 1.5rem;
+  max-width: 900px;
+  width: 100%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.3s ease;
+}
+
+/* Flash Animations */
+.game-container.flash-blue {
+  background: #4d94ff;
+  animation: flashBlue 1s ease;
+}
+
+.game-container.flash-red {
+  background: #ff6b6b;
+  animation: flashRed 1s ease;
+}
+
+@keyframes flashBlue {
+  0% { background: white; }
+  50% { background: #4d94ff; }
+  100% { background: white; }
+}
+
+@keyframes flashRed {
+  0% { background: white; }
+  50% { background: #ff6b6b; }
+  100% { background: white; }
+}
+
+/* Visual Area */
+.visual-area {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2rem;
+  min-height: 200px;
+}
+
+.placeholder-visual {
+  font-size: 8rem;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Answer Slots */
+.answer-slots {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  min-height: 80px;
+}
+
+.answer-slot {
+  width: 70px;
+  height: 70px;
+  border: 3px dashed #ccc;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f9f9f9;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.answer-slot:hover {
+  border-color: #667eea;
+  background: #f0f0ff;
+}
+
+/* Letter Tile Wrapper */
+.letter-tile-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Remove Letter X Button */
+.remove-letter {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #ff6b6b;
+  color: white;
+  border: 2px solid white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s;
+  z-index: 10;
+}
+
+.remove-letter:hover {
+  background: #ff5252;
+  transform: scale(1.1);
+}
+
+.remove-letter:active {
+  transform: scale(0.95);
+}
+
+/* Letter Pool - All alphabets at top */
+.letter-pool {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: #f5f5f5;
+  border-radius: 10px;
+}
+
+.letter-tile {
+  width: 45px;
+  height: 45px;
+  background: white;
+  border: 2px solid #667eea;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #667eea;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  user-select: none;
+}
+
+.letter-tile:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.letter-tile:active {
+  cursor: grabbing;
+  transform: scale(0.95);
+}
+
+.letter-tile.placed {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+/* Back Button */
+.back-button {
+  margin-top: 2rem;
+  padding: 0.8rem 2rem;
+  background: white;
+  color: #667eea;
+  border: 2px solid white;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.back-button:hover {
+  background: transparent;
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .game-container {
+    padding: 1rem;
+    max-width: 100%;
+  }
+
+  .letter-pool {
+    gap: 0.3rem;
+    padding: 0.8rem;
+  }
+
+  .letter-tile {
+    width: 35px;
+    height: 35px;
+    font-size: 1rem;
+  }
+
+  .placeholder-visual {
+    font-size: 6rem;
+  }
+
+  .answer-slot {
+    width: 55px;
+    height: 55px;
+  }
+
+  .answer-slot .letter-tile {
+    width: 100%;
+    height: 100%;
+  }
+}
