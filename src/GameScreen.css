@@ -25,6 +25,21 @@
   z-index: 100;
 }
 
+/* Word Counter - Top Right */
+.word-counter {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  background: white;
+  color: #667eea;
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+}
+
 .game-container {
   background: white;
   border-radius: 20px;
@@ -213,6 +228,65 @@
   transform: translateY(-2px);
 }
 
+/* Congratulations Screen */
+.congratulations-screen {
+  background: white;
+  border-radius: 20px;
+  padding: 3rem;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  animation: popIn 0.5s ease;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.congrats-title {
+  font-size: 3rem;
+  color: #667eea;
+  margin: 0 0 1rem 0;
+  animation: bounce 1s infinite;
+}
+
+.congrats-message {
+  font-size: 1.5rem;
+  color: #333;
+  margin: 1rem 0;
+}
+
+.final-score {
+  font-size: 2rem;
+  color: #667eea;
+  font-weight: bold;
+  margin: 2rem 0;
+}
+
+.play-again-button {
+  font-size: 1.5rem;
+  padding: 1rem 3rem;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s;
+  margin-top: 1rem;
+}
+
+.play-again-button:hover {
+  background: #5568d3;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.play-again-button:active {
+  transform: translateY(0);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .game-container {
@@ -243,5 +317,23 @@
   .answer-slot .letter-tile {
     width: 100%;
     height: 100%;
+  }
+
+  .congrats-title {
+    font-size: 2rem;
+  }
+
+  .congrats-message {
+    font-size: 1.2rem;
+  }
+
+  .final-score {
+    font-size: 1.5rem;
+  }
+
+  .points-counter,
+  .word-counter {
+    padding: 0.8rem 1.5rem;
+    font-size: 1.2rem;
   }
 }

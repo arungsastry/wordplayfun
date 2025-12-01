@@ -1,17 +1,23 @@
 import { createSignal, For, createEffect } from 'solid-js';
 import './GameScreen.css';
+import { WORDS } from './words';
 
 function GameScreen(props) {
-  // Sample first word - "CAT" (hidden from display)
-  const [currentWord] = createSignal('CAT');
+  const [currentWordIndex, setCurrentWordIndex] = createSignal(0);
+  const [gameComplete, setGameComplete] = createSignal(false);
 
-  // All alphabets A-Z
+  const currentWordData = () => WORDS[currentWordIndex()];
+  const currentWord = () => currentWordData().word;
+  const currentEmoji = () => currentWordData().emoji;
+
+  // All alphabets A-Z - constant, never changes
   const allLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-  const [letterPool, setLetterPool] = createSignal(allLetters);
-  const [answerSlots, setAnswerSlots] = createSignal([null, null, null]); // 3 slots for CAT
+  const [answerSlots, setAnswerSlots] = createSignal(
+    new Array(currentWord().length).fill(null)
+  );
   const [draggedLetter, setDraggedLetter] = createSignal(null);
   const [points, setPoints] = createSignal(0);
-  const [flashColor, setFlashColor] = createSignal(null); // 'blue' or 'red'
+  const [flashColor, setFlashColor] = createSignal(null);
   const [isChecking, setIsChecking] = createSignal(false);
 
   // Check answer when slots change
@@ -29,7 +35,18 @@ function GameScreen(props) {
         setPoints(p => p + 1);
         setTimeout(() => {
           setFlashColor(null);
-          resetGame();
+
+          // Move to next word or complete game
+          const nextIndex = currentWordIndex() + 1;
+          if (nextIndex < WORDS.length) {
+            setCurrentWordIndex(nextIndex);
+            const nextWordLength = WORDS[nextIndex].word.length;
+            setAnswerSlots(new Array(nextWordLength).fill(null));
+          } else {
+            // All words completed!
+            setGameComplete(true);
+          }
+
           setIsChecking(false);
         }, 1000);
       } else {
@@ -43,37 +60,26 @@ function GameScreen(props) {
     }
   });
 
-  const resetGame = () => {
-    setAnswerSlots([null, null, null]);
-    setLetterPool(allLetters);
-  };
-
   const removeLetter = (slotIndex) => {
     const letter = answerSlots()[slotIndex];
     if (letter) {
-      // Return letter to pool
-      setLetterPool([...letterPool(), letter]);
-      // Clear the slot
+      // Clear the slot (letter stays in alphabet pool)
       const newSlots = [...answerSlots()];
       newSlots[slotIndex] = null;
       setAnswerSlots(newSlots);
     }
   };
 
-  const clickToPlace = (letter, poolIndex) => {
+  const clickToPlace = (letter) => {
     // Find first empty slot
     const slots = answerSlots();
     const emptySlotIndex = slots.findIndex(slot => slot === null);
 
     if (emptySlotIndex !== -1) {
-      // Place letter in first empty slot
+      // Place letter in first empty slot (letter stays in alphabet pool)
       const newSlots = [...slots];
       newSlots[emptySlotIndex] = letter;
       setAnswerSlots(newSlots);
-
-      // Remove letter from pool
-      const newPool = letterPool().filter((_, i) => i !== poolIndex);
-      setLetterPool(newPool);
     }
   };
 
@@ -98,19 +104,13 @@ function GameScreen(props) {
 
     const newSlots = [...answerSlots()];
     newSlots[slotIndex] = dragged.letter;
-    setAnswerSlots(newSlots);
 
-    // Remove letter from pool if it came from pool
-    if (dragged.fromPool) {
-      const newPool = letterPool().filter((_, i) => i !== dragged.index);
-      setLetterPool(newPool);
-    } else {
-      // If moving from another slot, clear the old slot
-      const oldSlots = [...answerSlots()];
-      oldSlots[dragged.index] = null;
-      setAnswerSlots(oldSlots);
+    // If moving from another slot, clear the old slot
+    if (!dragged.fromPool) {
+      newSlots[dragged.index] = null;
     }
 
+    setAnswerSlots(newSlots);
     setDraggedLetter(null);
   };
 
@@ -119,19 +119,39 @@ function GameScreen(props) {
     const dragged = draggedLetter();
     if (!dragged || dragged.fromPool) return;
 
-    // Return letter to pool from answer slot
-    setLetterPool([...letterPool(), dragged.letter]);
+    // Remove letter from answer slot (it stays in alphabet pool)
     const newSlots = [...answerSlots()];
     newSlots[dragged.index] = null;
     setAnswerSlots(newSlots);
     setDraggedLetter(null);
   };
 
+  // Show congratulations screen if game complete
+  if (gameComplete()) {
+    return (
+      <div class="game-screen">
+        <div class="congratulations-screen">
+          <h1 class="congrats-title">🎉 CONGRATULATIONS! 🎉</h1>
+          <p class="congrats-message">You completed all {WORDS.length} words!</p>
+          <p class="final-score">Final Score: {points()} points</p>
+          <button class="play-again-button" onClick={props.onBack}>
+            Play Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div class="game-screen">
       {/* Points Counter - Bottom Left */}
       <div class="points-counter">
         Points: {points()}
+      </div>
+
+      {/* Word Counter - Top Right */}
+      <div class="word-counter">
+        Word {currentWordIndex() + 1} / {WORDS.length}
       </div>
 
       <div class={`game-container ${flashColor() ? `flash-${flashColor()}` : ''}`}>
@@ -141,13 +161,13 @@ function GameScreen(props) {
           onDragOver={handleDragOver}
           onDrop={handleDropOnPool}
         >
-          <For each={letterPool()}>
+          <For each={allLetters}>
             {(letter, index) => (
               <div
                 class="letter-tile"
                 draggable={true}
                 onDragStart={(e) => handleDragStart(e, letter, true, index())}
-                onClick={() => clickToPlace(letter, index())}
+                onClick={() => clickToPlace(letter)}
               >
                 {letter}
               </div>
@@ -158,7 +178,7 @@ function GameScreen(props) {
         {/* Visual/Image Area */}
         <div class="visual-area">
           <div class="placeholder-visual">
-            <span>🐱</span>
+            <span>{currentEmoji()}</span>
           </div>
         </div>
 
@@ -193,11 +213,6 @@ function GameScreen(props) {
           </For>
         </div>
       </div>
-
-      {/* Back Button */}
-      <button class="back-button" onClick={props.onBack}>
-        ← Back
-      </button>
     </div>
   );
 }
